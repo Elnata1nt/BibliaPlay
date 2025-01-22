@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Biblia Play",
-    description: "Desenvolvendo sua solução",
+    description: "Aprendendo a palavra de Deus",
     images: [
       {
         url: "https://biblia-play.vercel.app/home-biblia-play.png",
