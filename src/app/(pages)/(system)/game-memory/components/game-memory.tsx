@@ -68,9 +68,9 @@ export default function JogoMemoriaCristao() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-300 to-green-200 flex flex-col">
       <Header />
-      <main className="flex flex-col items-center justify-center flex-grow p-4">
-        <h1 className="text-3xl font-bold mb-4 text-blue-600">Jogo da Memória Cristão</h1>
-        <div className="grid grid-cols-4 gap-4 mb-4">
+      <main className="flex flex-col items-center justify-center flex-grow p-2 sm:p-4">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4 text-blue-600">Jogo da Memória Cristão</h1>
+        <div className="grid grid-cols-4 sm:grid-cols-4 gap-2 sm:gap-4 mb-2 sm:mb-4">
           {cartas.map((imagem, index) => (
             <Card
               key={index}
@@ -80,10 +80,14 @@ export default function JogoMemoriaCristao() {
             />
           ))}
         </div>
-        <p className="text-xl mb-4">Movimentos: {movimentos}</p>
-        <Button onClick={embaralharCartas}>Novo Jogo</Button>
+        <p className="text-lg sm:text-xl mb-2 sm:mb-4">Movimentos: {movimentos}</p>
+        <Button onClick={embaralharCartas} className="text-sm sm:text-base">
+          Novo Jogo
+        </Button>
         {!jogoIniciado && (
-          <p className="mt-4 text-lg text-blue-600">Memorize as posições! O jogo começará em breve...</p>
+          <p className="mt-2 sm:mt-4 text-base sm:text-lg text-blue-600">
+            Memorize as posições! O jogo começará em breve...
+          </p>
         )}
         {jogoCompleto && <Celebration movimentos={movimentos} onRestart={embaralharCartas} />}
       </main>
