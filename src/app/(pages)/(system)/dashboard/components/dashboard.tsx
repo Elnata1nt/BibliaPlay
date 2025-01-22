@@ -9,7 +9,7 @@ import { Header } from "@/components/(wellcome)/header/components/header"
 
 const games = [
   { name: "Quiz", path: "/game-quiz", description: "Teste seus conhecimentos" },
-  { name: "Jogo da Memória", path: "/memory", description: "Exercite sua mente" },
+  { name: "Jogo da Memória", path: "/game-memory", description: "Exercite sua mente" },
   { name: "Jogo da Fé", path: "/faith", description: "Fortaleça sua fé" },
   { name: "Decorando", path: "/decorating", description: "Aprenda versículos" },
 ]

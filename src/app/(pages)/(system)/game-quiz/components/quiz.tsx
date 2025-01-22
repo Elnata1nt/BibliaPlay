@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress"
 import { Header } from "@/components/(wellcome)/header/components/header"
 import confetti from "canvas-confetti"
 import { type Question, questions } from "@/app/api/questions"
-import { Loader2, RefreshCw } from "lucide-react"
+import { Loader2, RefreshCw, CheckCircle, XCircle } from "lucide-react"
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   const shuffled = [...array]
@@ -25,6 +25,8 @@ export default function QuizPage() {
   const [showScore, setShowScore] = useState(false)
   const [remainingQuestions, setRemainingQuestions] = useState<Question[]>([])
   const [progress, setProgress] = useState(0)
+  const [answerStatus, setAnswerStatus] = useState<"correct" | "incorrect" | null>(null)
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
 
   useEffect(() => {
     setRemainingQuestions(shuffleArray(questions))
@@ -37,24 +39,32 @@ export default function QuizPage() {
     setProgress(((questions.length - remainingQuestions.length) / questions.length) * 100)
   }, [remainingQuestions, currentQuestion])
 
-  const handleAnswer = (selectedAnswer: number) => {
-    if (currentQuestion && selectedAnswer === currentQuestion.correctAnswer) {
+  const handleAnswer = (selected: number) => {
+    setSelectedAnswer(selected)
+    if (currentQuestion && selected === currentQuestion.correctAnswer) {
       setScore(score + 1)
+      setAnswerStatus("correct")
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
       })
-    }
-
-    const newRemainingQuestions = remainingQuestions.slice(1)
-    setRemainingQuestions(newRemainingQuestions)
-
-    if (newRemainingQuestions.length === 0) {
-      setShowScore(true)
     } else {
-      setCurrentQuestion(newRemainingQuestions[0])
+      setAnswerStatus("incorrect")
     }
+
+    setTimeout(() => {
+      const newRemainingQuestions = remainingQuestions.slice(1)
+      setRemainingQuestions(newRemainingQuestions)
+
+      if (newRemainingQuestions.length === 0) {
+        setShowScore(true)
+      } else {
+        setCurrentQuestion(newRemainingQuestions[0])
+        setAnswerStatus(null)
+        setSelectedAnswer(null)
+      }
+    }, 2000) // Delay for 2 seconds before moving to the next question
   }
 
   const restartQuiz = () => {
@@ -63,6 +73,8 @@ export default function QuizPage() {
     setRemainingQuestions(shuffleArray(questions))
     setCurrentQuestion(null)
     setProgress(0)
+    setAnswerStatus(null)
+    setSelectedAnswer(null)
   }
 
   return (
@@ -115,15 +127,49 @@ export default function QuizPage() {
                       <Button
                         key={index}
                         onClick={() => handleAnswer(index)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-2xl text-lg transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg w-full text-left flex items-center"
+                        disabled={answerStatus !== null}
+                        className={`
+                          ${
+                            selectedAnswer === index
+                              ? answerStatus === "correct"
+                                ? "bg-green-500 hover:bg-green-600"
+                                : "bg-red-500 hover:bg-red-600"
+                              : "bg-blue-500 hover:bg-blue-600"
+                          }
+                          ${
+                            answerStatus !== null && index === currentQuestion.correctAnswer
+                              ? "bg-green-500 hover:bg-green-600"
+                              : ""
+                          }
+                          text-white font-semibold py-4 px-6 rounded-2xl text-lg transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg w-full text-left flex items-center justify-between
+                        `}
                       >
-                        <span className="bg-blue-400 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">
-                          {String.fromCharCode(65 + index)}
+                        <span className="flex items-center">
+                          <span className="bg-blue-400 text-white rounded-full w-8 h-8 flex items-center justify-center mr-3">
+                            {String.fromCharCode(65 + index)}
+                          </span>
+                          {option}
                         </span>
-                        {option}
+                        {answerStatus !== null &&
+                          (index === currentQuestion.correctAnswer ? (
+                            <CheckCircle className="h-6 w-6 text-white" />
+                          ) : selectedAnswer === index ? (
+                            <XCircle className="h-6 w-6 text-white" />
+                          ) : null)}
                       </Button>
                     ))}
                   </div>
+                  {answerStatus === "incorrect" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-4 p-4 bg-red-100 border border-red-300 rounded-lg"
+                    >
+                      <p className="text-red-700 font-semibold">
+                        Ops! A resposta correta era: {currentQuestion.options[currentQuestion.correctAnswer]}
+                      </p>
+                    </motion.div>
+                  )}
                 </motion.div>
               ) : (
                 <motion.div
